@@ -11,21 +11,24 @@ const mockPosts = [
     title: "Welcome to School Reddit!",
     content: "This is our first post. Let's build a great community together.",
     username: "admin",
-    created_at: "2024-01-01T00:00:00Z"
+    created_at: "2024-01-01T00:00:00Z",
+    score: 10
   },
   {
     id: 2,
     title: "Study Group for Math 101",
     content: "Looking for people to form a study group for the upcoming midterm.",
     username: "student123",
-    created_at: "2024-01-02T00:00:00Z"
+    created_at: "2024-01-02T00:00:00Z",
+    score: 0
   },
   {
     id: 3,
     title: "Campus Event: Tech Talk Tomorrow",
     content: "Don't miss the guest speaker from Google tomorrow at 3 PM in the auditorium. Free pizza!",
     username: "events_admin",
-    created_at: "2024-01-03T00:00:00Z"
+    created_at: "2024-01-03T00:00:00Z",
+    score: -1
   }
 ]
 
@@ -59,9 +62,11 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            sortedPosts.map((post) => (
+            <div className="space-y-4">
+            {posts.map((post) => (
               <PostCard key={post.id} post={post} />
-            ))
+            ))}
+            </div>
           )}
         </div>
       </div>
