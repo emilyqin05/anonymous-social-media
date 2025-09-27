@@ -63,6 +63,8 @@ export default function CoursePage({ params }: CoursePageProps) {
         await followsApi.followCourse(params.courseId)
         setIsFollowing(true)
       }
+      // Trigger sidebar refresh
+      window.dispatchEvent(new CustomEvent('sidebar-refresh'))
     } catch (error) {
       console.error('Error toggling course follow:', error)
     }
@@ -74,6 +76,8 @@ export default function CoursePage({ params }: CoursePageProps) {
     try {
       await followsApi.setProfessorPreference(params.courseId, professor)
       setPreferredProfessor(professor)
+      // Trigger sidebar refresh
+      window.dispatchEvent(new CustomEvent('sidebar-refresh'))
     } catch (error) {
       console.error('Error setting professor preference:', error)
     }

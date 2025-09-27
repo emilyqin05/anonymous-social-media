@@ -103,6 +103,8 @@ export default function ExplorePage() {
         await followsApi.followTag(tag)
         setFollowedTags(prev => [...prev, tag])
       }
+      // Trigger sidebar refresh
+      window.dispatchEvent(new CustomEvent('sidebar-refresh'))
     } catch (error) {
       console.error('Error toggling tag follow:', error)
     }
@@ -119,6 +121,8 @@ export default function ExplorePage() {
         await followsApi.followCourse(courseId)
         setFollowedCourses(prev => [...prev, courseId])
       }
+      // Trigger sidebar refresh
+      window.dispatchEvent(new CustomEvent('sidebar-refresh'))
     } catch (error) {
       console.error('Error toggling course follow:', error)
     }
