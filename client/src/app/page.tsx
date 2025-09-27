@@ -1,75 +1,94 @@
 "use client"
 
 import { useState } from "react"
-import Navbar from "@/components/Navbar"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus } from "lucide-react"
+import Link from "next/link"
 import PostCard from "@/components/PostCard"
-
-// Temporary placeholder data - we'll replace this with real API calls later
-const mockPosts = [
-  {
-    id: 1,
-    title: "Welcome to School Reddit!",
-    content: "This is our first post. Let's build a great community together.",
-    username: "admin",
-    created_at: "2024-01-01T00:00:00Z",
-    score: 10
-  },
-  {
-    id: 2,
-    title: "Study Group for Math 101",
-    content: "Looking for people to form a study group for the upcoming midterm.",
-    username: "student123",
-    created_at: "2024-01-02T00:00:00Z",
-    score: 0
-  },
-  {
-    id: 3,
-    title: "Campus Event: Tech Talk Tomorrow",
-    content: "Don't miss the guest speaker from Google tomorrow at 3 PM in the auditorium. Free pizza!",
-    username: "events_admin",
-    created_at: "2024-01-03T00:00:00Z",
-    score: -1
-  }
-]
+import { useAppState } from "@/hooks/useAppState"
 
 export default function HomePage() {
-  const [posts, setPosts] = useState(mockPosts)
-  const [sortBy, setSortBy] = useState<"new">("new") // Simplified since we don't have scores yet
+  const { posts, courses, followedCourses, followedTags, professorPreferences } = useAppState()
+  const [sortBy, setSortBy] = useState<"score" | "new">("score")
 
-  // Simple sorting function - for now just sort by date
-  const sortedPosts = [...posts].sort((a, b) => {
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  })
+  const getHomeFeedPosts = () => {
+    const followedCoursePosts = posts.filter((post) => {
+      if (!post.courseId || !followedCourses.includes(post.courseId)) return false
+
+      const preferredProf = professorPreferences[post.courseId]
+      if (preferredProf && post.professor && post.professor !== preferredProf) return false
+
+      return true
+    })
+
+    const explorePostsWithFollowedTags = posts.filter(
+      (post) => !post.courseId && post.tags.some((tag) => followedTags.includes(tag)) && post.score >= 10,
+    )
+
+    const allHomePosts = [...followedCoursePosts, ...explorePostsWithFollowedTags]
+
+    return sortBy === "score"
+      ? allHomePosts.sort((a, b) => b.score - a.score)
+      : allHomePosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  }
+
+  const homePosts = getHomeFeedPosts()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">School Reddit</h1>
-          <p className="text-gray-600">Share and discuss with your school community</p>
-        </div>
-
-        {/* Posts list */}
-        <div className="space-y-4">
-          {sortedPosts.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
-              <div className="max-w-sm mx-auto">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
-                <p className="text-gray-600 mb-4">Be the first to share something with your school community!</p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-            </div>
-          )}
-        </div>
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Home Feed</h1>
+        <p className="text-muted-foreground">
+          Posts from your followed courses and popular posts with your followed tags
+        </p>
       </div>
+
+      {/* Sort and Create Post */}
+      <div className="flex items-center justify-between mb-6">
+        <Select value={sortBy} onValueChange={(value: "score" | "new") => setSortBy(value)}>
+          <SelectTrigger className="w-32">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="score">Hot</SelectItem>
+            <SelectItem value="new">New</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Link href="/create">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Post
+          </Button>
+        </Link>
+      </div>
+
+      {/* Posts */}
+      {homePosts.length === 0 ? (
+        <div className="text-center py-12 bg-card rounded-lg border">
+          <div className="max-w-sm mx-auto">
+            <h3 className="text-lg font-medium mb-2">No posts in your feed</h3>
+            <p className="text-muted-foreground mb-4">
+              Follow some courses and tags to see posts here, or explore to find interesting content!
+            </p>
+            <div className="space-x-2">
+              <Link href="/explore">
+                <Button variant="outline">Explore</Button>
+              </Link>
+              <Link href="/create">
+                <Button>Create Post</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {homePosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
