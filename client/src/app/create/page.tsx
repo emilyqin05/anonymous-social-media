@@ -5,8 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import Navbar from "@/components/Navbar"
-import axios from "axios"
+import api from "@/lib/axios"
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("")
@@ -34,7 +33,7 @@ export default function CreatePostPage() {
     }
 
     try {
-      await axios.post("/api/posts", { title: title.trim(), content: content.trim() })
+      await api.post("/posts", { title: title.trim(), content: content.trim() })
       router.push("/")
     } catch (error: any) {
       setError(error.response?.data?.error || "Failed to create post")
@@ -46,7 +45,6 @@ export default function CreatePostPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
         <div className="max-w-4xl mx-auto py-8 px-4">
           <div className="text-center">Please log in to create a post.</div>
         </div>
@@ -56,7 +54,6 @@ export default function CreatePostPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
 
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="mb-8">

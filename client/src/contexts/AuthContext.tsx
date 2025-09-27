@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import axios from "axios"
+import api from "@/lib/axios"
 
 interface User {
   id: number
@@ -28,9 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for existing token on mount
     const token = localStorage.getItem("token")
     if (token) {
-      // Set axios default header
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
-
       // Decode token to get user info (simple JWT decode)
       try {
         const payload = JSON.parse(atob(token.split(".")[1]))
@@ -42,7 +39,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         // Invalid token, remove it
         localStorage.removeItem("token")
-        delete axios.defaults.headers.common["Authorization"]
       }
     }
     setLoading(false)
@@ -50,11 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post("/api/auth/login", { email, password })
+      const response = await api.post("/auth/login", { email, password })
       const { token, user: userData } = response.data
 
       localStorage.setItem("token", token)
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
       setUser(userData)
     } catch (error: any) {
       throw new Error(error.response?.data?.error || "Login failed")
@@ -63,11 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await axios.post("/api/auth/register", { username, email, password })
+      const response = await api.post("/auth/register", { username, email, password })
       const { token, user: userData } = response.data
 
       localStorage.setItem("token", token)
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`
       setUser(userData)
     } catch (error: any) {
       throw new Error(error.response?.data?.error || "Registration failed")
@@ -76,7 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("token")
-    delete axios.defaults.headers.common["Authorization"]
     setUser(null)
   }
 
