@@ -25,12 +25,12 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <Link
+                {/* <Link
                   href="/create"
                   className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
                 >
                   Create Post
-                </Link>
+                </Link> */}
                 <span className="text-gray-700">{user.username}</span>
                 <button
                   onClick={logout}
