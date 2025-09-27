@@ -30,7 +30,7 @@ export default function HomePage() {
 
     return sortBy === "score"
       ? allHomePosts.sort((a, b) => b.score - a.score)
-      : allHomePosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      : allHomePosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   }
 
   const homePosts = getHomeFeedPosts()

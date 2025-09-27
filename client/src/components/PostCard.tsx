@@ -1,20 +1,31 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ChevronUp, ChevronDown, MessageCircle, Share } from "lucide-react"
-import Link from "next/link"
-import { useAppState, type Post } from "@/hooks/useAppState"
+import { useState } from "react"
+import VoteButtons from "./VoteButtons"
+
+interface Post {
+  id: number
+  title: string
+  content: string
+  username: string
+  score: number
+  user_vote?: number
+  created_at: string
+}
 
 interface PostCardProps {
   post: Post
 }
 
-export default function PostCard({ post }: PostCardProps) {
-  const { voteOnPost, courses } = useAppState()
+export default function PostCard({ post: initialPost }: PostCardProps) {
+  const [post, setPost] = useState(initialPost)
 
-  const handleVote = (voteType: number) => {
-    voteOnPost(post.id, voteType)
+  const handleVoteChange = (newScore: number, newUserVote: number | null) => {
+    setPost((prev) => ({
+      ...prev,
+      score: newScore,
+      user_vote: newUserVote || undefined,
+    }))
   }
 
   const formatDate = (dateString: string) => {
@@ -33,85 +44,62 @@ export default function PostCard({ post }: PostCardProps) {
     }
   }
 
-  const course = post.courseId ? courses.find((c) => c.id === post.courseId) : null
+  const formatContent = (content: string) => {
+    // Simple formatting: preserve line breaks and limit length for preview
+    const maxLength = 500
+    if (content.length <= maxLength) {
+      return content
+    }
+    return content.substring(0, maxLength) + "..."
+  }
 
   return (
-    <div className="bg-card rounded-lg border hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
       <div className="flex p-4">
         {/* Voting section */}
-        <div className="flex flex-col items-center mr-4 space-y-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleVote(1)}
-            className={`p-1 h-8 w-8 ${post.userVote === 1 ? "text-orange-500" : "text-muted-foreground"}`}
-          >
-            <ChevronUp className="h-4 w-4" />
-          </Button>
-          <span
-            className={`text-sm font-medium ${
-              post.userVote === 1 ? "text-orange-500" : post.userVote === -1 ? "text-blue-500" : "text-foreground"
-            }`}
-          >
-            {post.score}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleVote(-1)}
-            className={`p-1 h-8 w-8 ${post.userVote === -1 ? "text-blue-500" : "text-muted-foreground"}`}
-          >
-            <ChevronDown className="h-4 w-4" />
-          </Button>
+        <div className="mr-4">
+          <VoteButtons postId={post.id} score={post.score} userVote={post.user_vote} onVoteChange={handleVoteChange} />
         </div>
 
         {/* Post content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center text-xs text-muted-foreground mb-2 space-x-2">
-            {course && (
-              <>
-                <Link href={`/course/${course.id}`}>
-                  <Badge variant="secondary" className="hover:bg-secondary/80">
-                    {course.code}
-                  </Badge>
-                </Link>
-                {post.professor && <Badge variant="outline">{post.professor}</Badge>}
-              </>
-            )}
-            <span>u/{post.author}</span>
-            <span>•</span>
-            <span>{formatDate(post.createdAt)}</span>
+          <div className="flex items-center text-xs text-gray-500 mb-2">
+            <span className="font-medium">u/{post.username}</span>
+            <span className="mx-1">•</span>
+            <span>{formatDate(post.created_at)}</span>
           </div>
 
-          <h3 className="text-lg font-semibold mb-2 leading-tight">{post.title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-tight">{post.title}</h3>
 
-          <div className="text-sm text-muted-foreground mb-3">
-            <p className="whitespace-pre-wrap break-words">{post.content}</p>
+          <div className="text-gray-700 text-sm leading-relaxed">
+            <p className="whitespace-pre-wrap break-words">{formatContent(post.content)}</p>
           </div>
-
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
-              {post.tags.map((tag) => (
-                <Link key={tag} href={`/explore?tag=${tag}`}>
-                  <Badge variant="outline" className="text-xs hover:bg-secondary">
-                    #{tag}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-          )}
 
           {/* Post actions */}
-          <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-            <Button variant="ghost" size="sm" className="h-8 px-2">
-              <MessageCircle className="mr-1 h-3 w-3" />
-              Comments
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 px-2">
-              <Share className="mr-1 h-3 w-3" />
-              Share
-            </Button>
+          <div className="flex items-center mt-3 space-x-4 text-xs text-gray-500">
+            <button className="flex items-center space-x-1 hover:text-gray-700 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <span>Comments</span>
+            </button>
+
+            <button className="flex items-center space-x-1 hover:text-gray-700 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                />
+              </svg>
+              <span>Share</span>
+            </button>
           </div>
         </div>
       </div>

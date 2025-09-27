@@ -6,10 +6,10 @@ export interface Post {
   id: number
   title: string
   content: string
-  author: string
+  username: string // Changed from 'author' to 'username'
   score: number
-  userVote: number | null
-  createdAt: string
+  user_vote?: number // Changed from 'userVote' to 'user_vote'
+  created_at: string // Changed from 'createdAt' to 'created_at'
   courseId?: string
   professor?: string
   tags: string[]
@@ -38,10 +38,10 @@ const initialPosts: Post[] = [
     id: 1,
     title: "Tips for CS 101 Final Exam",
     content: "Here are some study tips that helped me ace the final...",
-    author: "student123",
+    username: "student123", // Changed from 'author'
     score: 15,
-    userVote: null,
-    createdAt: "2024-01-15T10:30:00Z",
+    user_vote: undefined, // Changed from 'userVote'
+    created_at: "2024-01-15T10:30:00Z", // Changed from 'createdAt'
     courseId: "cs101",
     professor: "Dr. Smith",
     tags: ["study-tips", "finals"],
@@ -50,10 +50,10 @@ const initialPosts: Post[] = [
     id: 2,
     title: "Math 201 Homework Help",
     content: "Can someone explain problem 3.4? I'm stuck on the integration part.",
-    author: "mathstudent",
+    username: "mathstudent",
     score: 8,
-    userVote: null,
-    createdAt: "2024-01-14T15:45:00Z",
+    user_vote: undefined,
+    created_at: "2024-01-14T15:45:00Z",
     courseId: "math201",
     professor: "Prof. Johnson",
     tags: ["homework", "help"],
@@ -62,20 +62,20 @@ const initialPosts: Post[] = [
     id: 3,
     title: "Best Study Spots on Campus",
     content: "The library's third floor is amazing for group study sessions!",
-    author: "campusexplorer",
+    username: "campusexplorer",
     score: 23,
-    userVote: null,
-    createdAt: "2024-01-13T09:15:00Z",
+    user_vote: undefined,
+    created_at: "2024-01-13T09:15:00Z",
     tags: ["campus", "study-spots"],
   },
   {
     id: 4,
     title: "Physics 301 Lab Report Guidelines",
     content: "Professor Wilson shared these formatting requirements...",
-    author: "physicsTA",
+    username: "physicsTA",
     score: 12,
-    userVote: null,
-    createdAt: "2024-01-12T14:20:00Z",
+    user_vote: 5,
+    created_at: "2024-01-12T14:20:00Z",
     courseId: "phys301",
     professor: "Prof. Wilson",
     tags: ["lab-reports", "guidelines"],
@@ -162,14 +162,14 @@ export function useAppState() {
       ...prev,
       posts: prev.posts.map((post) => {
         if (post.id === postId) {
-          const oldVote = post.userVote || 0
-          const newVote = post.userVote === voteType ? 0 : voteType
+          const oldVote = post.user_vote || 0 // Changed from 'userVote'
+          const newVote = post.user_vote === voteType ? 0 : voteType
           const scoreDiff = newVote - oldVote
 
           return {
             ...post,
             score: post.score + scoreDiff,
-            userVote: newVote === 0 ? null : newVote,
+            user_vote: newVote === 0 ? undefined : newVote, // Changed from 'userVote'
           }
         }
         return post
@@ -177,13 +177,13 @@ export function useAppState() {
     }))
   }
 
-  const addPost = (post: Omit<Post, "id" | "score" | "userVote" | "createdAt">) => {
+  const addPost = (post: Omit<Post, "id" | "score" | "user_vote" | "created_at">) => {
     const newPost: Post = {
       ...post,
       id: Math.max(...state.posts.map((p) => p.id)) + 1,
       score: 1,
-      userVote: 1,
-      createdAt: new Date().toISOString(),
+      user_vote: 1, // Changed from 'userVote'
+      created_at: new Date().toISOString(), // Changed from 'createdAt'
     }
 
     setState((prev) => ({
