@@ -49,48 +49,64 @@ router.get('/feed', (req, res) => {
 
     // Get posts from followed courses
     let coursePostsQuery = `
-      SELECT 
-        p.*,
+      SELECT DISTINCT
+        p.id, p.title, p.content, p.username, p.score, p.course_id, p.professor, p.created_at,
         GROUP_CONCAT(t.name) as tags
       FROM posts p
       LEFT JOIN post_tags pt ON p.id = pt.post_id
       LEFT JOIN tags t ON pt.tag_id = t.id
       WHERE p.course_id IN (${followedCourses.map(() => '?').join(',')})
+      GROUP BY p.id
     `;
 
     const params = [...followedCourses];
 
-    // Get posts with followed tags (from explore posts)
-    let explorePostsQuery = `
-      SELECT 
-        p.*,
-        GROUP_CONCAT(t.name) as tags
-      FROM posts p
-      LEFT JOIN post_tags pt ON p.id = pt.post_id
-      LEFT JOIN tags t ON pt.tag_id = t.id
-      WHERE p.course_id IS NULL
-      AND EXISTS (
-        SELECT 1 FROM post_tags pt2 
-        JOIN tags t2 ON pt2.tag_id = t2.id 
-        WHERE pt2.post_id = p.id 
-        AND t2.name IN (${followedTags.map(() => '?').join(',')})
-      )
-      AND p.score >= 10
-    `;
-
-    const exploreParams = [...followedTags];
+    // Get posts with followed tags (from explore posts) - only if user follows tags
+    let explorePostsQuery = '';
+    let exploreParams = [];
+    
+    if (followedTags.length > 0) {
+      explorePostsQuery = `
+        SELECT DISTINCT
+          p.id, p.title, p.content, p.username, p.score, p.course_id, p.professor, p.created_at,
+          GROUP_CONCAT(t.name) as tags
+        FROM posts p
+        LEFT JOIN post_tags pt ON p.id = pt.post_id
+        LEFT JOIN tags t ON pt.tag_id = t.id
+        WHERE p.course_id IS NULL
+        AND EXISTS (
+          SELECT 1 FROM post_tags pt2 
+          JOIN tags t2 ON pt2.tag_id = t2.id 
+          WHERE pt2.post_id = p.id 
+          AND t2.name IN (${followedTags.map(() => '?').join(',')})
+        )
+        AND p.score >= 5
+        GROUP BY p.id
+      `;
+      exploreParams = [...followedTags];
+    }
 
     // Combine both queries
-    const combinedQuery = `
-      ${coursePostsQuery}
-      UNION
-      ${explorePostsQuery}
-      GROUP BY p.id
-      ORDER BY ${sortBy === 'score' ? 'p.score DESC' : 'p.created_at DESC'}
-      LIMIT ?
-    `;
-
-    const allParams = [...params, ...exploreParams, parseInt(limit)];
+    let combinedQuery;
+    let allParams;
+    
+    if (explorePostsQuery) {
+      combinedQuery = `
+        ${coursePostsQuery}
+        UNION
+        ${explorePostsQuery}
+        ORDER BY ${sortBy === 'score' ? 'score DESC' : 'created_at DESC'}
+        LIMIT ?
+      `;
+      allParams = [...params, ...exploreParams, parseInt(limit)];
+    } else {
+      combinedQuery = `
+        ${coursePostsQuery}
+        ORDER BY ${sortBy === 'score' ? 'score DESC' : 'created_at DESC'}
+        LIMIT ?
+      `;
+      allParams = [...params, parseInt(limit)];
+    }
 
     db.all(combinedQuery, allParams, (err, rows) => {
       if (err) {

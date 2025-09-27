@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Users, BookOpen, Plus } from "lucide-react"
 import Link from "next/link"
 import PostCard from "@/components/PostCard"
-import { useAppState } from "@/hooks/useAppState"
+import { postsApi, coursesApi, followsApi, Post, Course } from "@/lib/api"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface CoursePageProps {
   params: {
@@ -16,15 +17,79 @@ interface CoursePageProps {
 }
 
 export default function CoursePage({ params }: CoursePageProps) {
-  const { posts, courses, followedCourses, professorPreferences, toggleCourseFollow, setProfessorPreference } =
-    useAppState()
+  const { user } = useAuth()
+  const [course, setCourse] = useState<Course | null>(null)
+  const [posts, setPosts] = useState<Post[]>([])
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [preferredProfessor, setPreferredProfessor] = useState<string>("")
   const [sortBy, setSortBy] = useState<"score" | "new">("score")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  const course = courses.find((c) => c.id === params.courseId)
-  const isFollowing = followedCourses.includes(params.courseId)
-  const preferredProfessor = professorPreferences[params.courseId]
+  useEffect(() => {
+    loadCourseData()
+  }, [params.courseId, sortBy])
 
-  if (!course) {
+  const loadCourseData = async () => {
+    try {
+      setLoading(true)
+      const [courseData, postsData, followedCourses, professorPreferences] = await Promise.all([
+        coursesApi.getById(params.courseId),
+        postsApi.getAll({ courseId: params.courseId, sortBy }),
+        user ? followsApi.getFollowedCourses() : Promise.resolve([]),
+        user ? followsApi.getProfessorPreferences() : Promise.resolve({})
+      ])
+      
+      setCourse(courseData)
+      setPosts(postsData)
+      setIsFollowing(followedCourses.includes(params.courseId))
+      setPreferredProfessor(professorPreferences[params.courseId] || "")
+    } catch (error) {
+      console.error('Error loading course data:', error)
+      setError('Failed to load course data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleCourseFollow = async () => {
+    if (!user) return
+    
+    try {
+      if (isFollowing) {
+        await followsApi.unfollowCourse(params.courseId)
+        setIsFollowing(false)
+      } else {
+        await followsApi.followCourse(params.courseId)
+        setIsFollowing(true)
+      }
+    } catch (error) {
+      console.error('Error toggling course follow:', error)
+    }
+  }
+
+  const setProfessorPreference = async (professor: string) => {
+    if (!user) return
+    
+    try {
+      await followsApi.setProfessorPreference(params.courseId, professor)
+      setPreferredProfessor(professor)
+    } catch (error) {
+      console.error('Error setting professor preference:', error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">Loading course...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !course) {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <div className="text-center py-12">
@@ -38,12 +103,6 @@ export default function CoursePage({ params }: CoursePageProps) {
     )
   }
 
-  const coursePosts = posts
-    .filter((post) => post.courseId === params.courseId)
-    .sort((a, b) =>
-      sortBy === "score" ? b.score - a.score : new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-    )
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Course Header */}
@@ -54,7 +113,11 @@ export default function CoursePage({ params }: CoursePageProps) {
             <h2 className="text-xl text-muted-foreground mb-2">{course.name}</h2>
             <p className="text-muted-foreground">{course.description}</p>
           </div>
-          <Button variant={isFollowing ? "default" : "outline"} onClick={() => toggleCourseFollow(params.courseId)}>
+          <Button 
+            variant={isFollowing ? "default" : "outline"} 
+            onClick={toggleCourseFollow}
+            disabled={!user}
+          >
             <BookOpen className="mr-2 h-4 w-4" />
             {isFollowing ? "Following" : "Follow"}
           </Button>
@@ -75,15 +138,15 @@ export default function CoursePage({ params }: CoursePageProps) {
               <Badge
                 key={professor}
                 variant={preferredProfessor === professor ? "default" : "outline"}
-                className="cursor-pointer hover:bg-secondary"
-                onClick={() => setProfessorPreference(params.courseId, professor)}
+                className={`cursor-pointer hover:bg-secondary ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={() => user && setProfessorPreference(professor)}
               >
                 {professor}
                 {preferredProfessor === professor && " ✓"}
               </Badge>
             ))}
           </div>
-          {isFollowing && (
+          {isFollowing && user && (
             <p className="text-xs text-muted-foreground">
               {preferredProfessor
                 ? `You'll see posts from ${preferredProfessor} in your home feed`
@@ -115,7 +178,7 @@ export default function CoursePage({ params }: CoursePageProps) {
         </div>
       </div>
 
-      {coursePosts.length === 0 ? (
+      {posts.length === 0 ? (
         <div className="text-center py-12 bg-card rounded-lg border">
           <h3 className="text-lg font-medium mb-2">No posts yet</h3>
           <p className="text-muted-foreground mb-4">Be the first to post in {course.code}!</p>
@@ -125,7 +188,7 @@ export default function CoursePage({ params }: CoursePageProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          {coursePosts.map((post) => (
+          {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

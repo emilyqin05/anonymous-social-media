@@ -1,39 +1,53 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import PostCard from "@/components/PostCard"
-import { useAppState } from "@/hooks/useAppState"
+import { usersApi, Post } from "@/lib/api"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function HomePage() {
-  const { posts, courses, followedCourses, followedTags, professorPreferences } = useAppState()
+  const { user } = useAuth()
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
   const [sortBy, setSortBy] = useState<"score" | "new">("score")
 
-  const getHomeFeedPosts = () => {
-    const followedCoursePosts = posts.filter((post) => {
-      if (!post.courseId || !followedCourses.includes(post.courseId)) return false
+  useEffect(() => {
+    if (user) {
+      loadFeed()
+    }
+  }, [user, sortBy])
 
-      const preferredProf = professorPreferences[post.courseId]
-      if (preferredProf && post.professor && post.professor !== preferredProf) return false
-
-      return true
-    })
-
-    const explorePostsWithFollowedTags = posts.filter(
-      (post) => !post.courseId && post.tags.some((tag) => followedTags.includes(tag)) && post.score >= 10,
-    )
-
-    const allHomePosts = [...followedCoursePosts, ...explorePostsWithFollowedTags]
-
-    return sortBy === "score"
-      ? allHomePosts.sort((a, b) => b.score - a.score)
-      : allHomePosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const loadFeed = async () => {
+    try {
+      setLoading(true)
+      const feedPosts = await usersApi.getFeed({ sortBy, limit: 50 })
+      setPosts(feedPosts)
+    } catch (error) {
+      console.error('Error loading feed:', error)
+      setError('Failed to load feed')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const homePosts = getHomeFeedPosts()
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-2">Welcome to School Reddit</h1>
+          <p className="text-muted-foreground mb-4">Please log in to see your personalized feed</p>
+          <Link href="/login">
+            <Button>Log In</Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -65,7 +79,16 @@ export default function HomePage() {
       </div>
 
       {/* Posts */}
-      {homePosts.length === 0 ? (
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="text-muted-foreground">Loading your feed...</div>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <div className="text-red-500 mb-4">{error}</div>
+          <Button onClick={loadFeed}>Try Again</Button>
+        </div>
+      ) : posts.length === 0 ? (
         <div className="text-center py-12 bg-card rounded-lg border">
           <div className="max-w-sm mx-auto">
             <h3 className="text-lg font-medium mb-2">No posts in your feed</h3>
@@ -84,7 +107,7 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {homePosts.map((post) => (
+          {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>
