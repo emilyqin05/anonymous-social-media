@@ -43,7 +43,7 @@ export default function CoursePage({ params }: CoursePageProps) {
       setCourse(courseData)
       setPosts(postsData)
       setIsFollowing(followedCourses.includes(params.courseId))
-      setPreferredProfessor(professorPreferences[params.courseId] || "")
+      setPreferredProfessor((professorPreferences as Record<string, string>)[params.courseId] || "")
     } catch (error) {
       console.error('Error loading course data:', error)
       setError('Failed to load course data')
