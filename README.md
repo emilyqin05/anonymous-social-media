@@ -1,2 +1,2 @@
 # anonymous-social-media
-SFU Reddit but for courses
+SFU Reddit, but for courses
