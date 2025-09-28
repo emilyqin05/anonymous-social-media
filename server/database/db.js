@@ -136,30 +136,30 @@ const seedData = () => {
       // Insert courses
       const courses = [
         {
-          id: 'cs101',
+          id: 'cmpt120',
           name: 'Introduction to Computer Science',
-          code: 'CS 101',
+          code: 'CMPT 120',
           description: 'Fundamentals of programming and computer science concepts',
           follower_count: 245
         },
         {
-          id: 'math201',
+          id: 'math152',
           name: 'Calculus II',
-          code: 'MATH 201',
+          code: 'MATH 152',
           description: 'Integration techniques and applications',
           follower_count: 189
         },
         {
-          id: 'phys301',
-          name: 'Advanced Physics',
-          code: 'PHYS 301',
-          description: 'Quantum mechanics and modern physics',
+          id: 'cmpt276',
+          name: 'Introduction to Software Engineering',
+          code: 'CMPT 276',
+          description: 'Software development and software project management',
           follower_count: 67
         },
         {
-          id: 'eng102',
-          name: 'English Composition',
-          code: 'ENG 102',
+          id: 'cmpt105w',
+          name: 'Social Issues and Communication',
+          code: 'CMPT 105W',
           description: 'Advanced writing and critical thinking',
           follower_count: 156
         }
@@ -177,13 +177,14 @@ const seedData = () => {
 
       // Insert professors
       const professors = [
-        { name: 'Dr. Smith', course_id: 'cs101' },
-        { name: 'Prof. Davis', course_id: 'cs101' },
-        { name: 'Prof. Johnson', course_id: 'math201' },
-        { name: 'Dr. Lee', course_id: 'math201' },
-        { name: 'Prof. Wilson', course_id: 'phys301' },
-        { name: 'Dr. Brown', course_id: 'eng102' },
-        { name: 'Prof. Taylor', course_id: 'eng102' }
+        { name: 'Prof. Nicholas Vincent', course_id: 'cmpt120' },
+        { name: 'Dr. Brian Fraser', course_id: 'cmpt120' },
+        { name: 'Prof. Jamie Mulholland', course_id: 'math152' },
+        { name: 'Prof. Michael Monagan', course_id: 'math152' },
+        { name: 'Prof. Saba Alimadadi', course_id: 'cmpt276' },
+        { name: 'Prof. Steven Pearce', course_id: 'cmpt276' },
+        { name: 'Prof. Harinder Khangura', course_id: 'cmpt105w' },
+        { name: 'Prof. Felix Lo', course_id: 'cmpt105w' }
       ];
 
       const insertProfessor = db.prepare(`
@@ -199,7 +200,11 @@ const seedData = () => {
       // Insert tags
       const tags = [
         'study-tips', 'finals', 'homework', 'help', 'campus', 'study-spots',
-        'lab-reports', 'guidelines', 'programming', 'math', 'physics', 'writing'
+        'lab-reports', 'guidelines', 'programming', 'math', 'physics', 'writing',
+        'study-partner', 'lab', 'integration', 'study-group', 'midterm',
+        'project', 'software-engineering', 'ideas', 'team', 'collaboration',
+        'git', 'essay', 'technology', 'peer-review', 'sfu', 'food', 'budget',
+        'parking', 'transportation', 'gym', 'fitness', 'clubs', 'social'
       ];
 
       const insertTag = db.prepare(`
@@ -214,41 +219,158 @@ const seedData = () => {
 
       // Insert posts
       const posts = [
+        // CMPT 120 posts
         {
-          title: "Tips for CS 101 Final Exam",
-          content: "Here are some study tips that helped me ace the final...",
-          username: "student123",
-          score: 15,
-          course_id: "cs101",
-          professor: "Dr. Smith",
-          tags: ["study-tips", "finals"]
+          title: "CMPT 120 Final Exam Tips - Dr. Fraser",
+          content: "Dr. Fraser's final is next week! Here are the key topics to focus on: recursion, linked lists, and basic algorithms. The exam is mostly coding questions with some theory. Practice the past midterms!",
+          username: "cs_student_2024",
+          score: 18,
+          course_id: "cmpt120",
+          professor: "Dr. Brian Fraser",
+          tags: ["study-tips", "finals", "programming"]
         },
         {
-          title: "Math 201 Homework Help",
-          content: "Can someone explain problem 3.4? I'm stuck on the integration part.",
-          username: "mathstudent",
+          title: "CMPT 120 Assignment 3 Help - Recursion",
+          content: "Stuck on the recursive binary search problem. Anyone have hints for the base case? I keep getting infinite loops...",
+          username: "struggling_coder",
+          score: 12,
+          course_id: "cmpt120",
+          professor: "Prof. Nicholas Vincent",
+          tags: ["homework", "help", "programming"]
+        },
+        {
+          title: "CMPT 120 Lab Partner Needed",
+          content: "Looking for a lab partner for the rest of the semester. I'm decent at coding but need help with debugging. Meet in AQ library?",
+          username: "looking_for_help",
           score: 8,
-          course_id: "math201",
-          professor: "Prof. Johnson",
-          tags: ["homework", "help"]
+          course_id: "cmpt120",
+          professor: null,
+          tags: ["study-partner", "lab", "help"]
+        },
+        
+        // MATH 152 posts
+        {
+          title: "MATH 152 Integration Techniques - Prof. Mulholland",
+          content: "Prof. Mulholland's integration by parts method is so much clearer than the textbook. Here's my cheat sheet for the common patterns!",
+          username: "math_enthusiast",
+          score: 15,
+          course_id: "math152",
+          professor: "Prof. Jamie Mulholland",
+          tags: ["study-tips", "math", "integration"]
         },
         {
-          title: "Best Study Spots on Campus",
-          content: "The library's third floor is amazing for group study sessions!",
-          username: "campusexplorer",
-          score: 23,
+          title: "MATH 152 Midterm Review Session",
+          content: "Anyone want to form a study group for the midterm next Friday? We can meet in the AQ study rooms and go through practice problems together.",
+          username: "study_group_organizer",
+          score: 22,
+          course_id: "math152",
+          professor: "Prof. Michael Monagan",
+          tags: ["study-group", "midterm", "math"]
+        },
+        {
+          title: "MATH 152 Assignment 4 - Partial Fractions",
+          content: "The partial fractions question is killing me. Can someone explain the decomposition step? I keep getting the wrong coefficients.",
+          username: "calculus_struggles",
+          score: 9,
+          course_id: "math152",
+          professor: null,
+          tags: ["homework", "help", "math"]
+        },
+
+        // CMPT 276 posts
+        {
+          title: "CMPT 276 Project Ideas - Prof. Alimadadi",
+          content: "Prof. Alimadadi suggested some great project ideas for the final project. Web app, mobile app, or desktop application - which would you choose?",
+          username: "project_planner",
+          score: 14,
+          course_id: "cmpt276",
+          professor: "Prof. Saba Alimadadi",
+          tags: ["project", "software-engineering", "ideas"]
+        },
+        {
+          title: "CMPT 276 Team Formation",
+          content: "Looking for 2 more team members for our CMPT 276 project. We're thinking of building a study group finder app. DM me if interested!",
+          username: "team_builder",
+          score: 11,
+          course_id: "cmpt276",
+          professor: "Prof. Steven Pearce",
+          tags: ["team", "project", "collaboration"]
+        },
+        {
+          title: "CMPT 276 Git Workflow Help",
+          content: "Our team is having merge conflicts every day. Any tips for better Git workflow in group projects? We're using GitHub but keep stepping on each other's toes.",
+          username: "git_newbie",
+          score: 7,
+          course_id: "cmpt276",
+          professor: null,
+          tags: ["git", "collaboration", "help"]
+        },
+
+        // CMPT 105W posts
+        {
+          title: "CMPT 105W Essay Topic Ideas - Prof. Khangura",
+          content: "Prof. Khangura wants us to write about technology's impact on society. Any interesting angles? I'm thinking about social media and mental health.",
+          username: "essay_writer",
+          score: 13,
+          course_id: "cmpt105w",
+          professor: "Prof. Harinder Khangura",
+          tags: ["essay", "writing", "technology"]
+        },
+        {
+          title: "CMPT 105W Peer Review Partners",
+          content: "Need someone to review my draft essay on AI ethics. I can review yours in return! 2000 words, due next Monday.",
+          username: "peer_reviewer",
+          score: 6,
+          course_id: "cmpt105w",
+          professor: "Prof. Felix Lo",
+          tags: ["peer-review", "essay", "collaboration"]
+        },
+
+        // General campus posts
+        {
+          title: "Best Study Spots at SFU Burnaby",
+          content: "The AQ library is packed during finals. Here are some hidden gems: 4th floor of the WMC, the quiet study rooms in the SUB, and the 24/7 study space in the Applied Sciences building!",
+          username: "campus_explorer",
+          score: 25,
           course_id: null,
           professor: null,
-          tags: ["campus", "study-spots"]
+          tags: ["campus", "study-spots", "sfu"]
         },
         {
-          title: "Physics 301 Lab Report Guidelines",
-          content: "Professor Wilson shared these formatting requirements...",
-          username: "physicsTA",
+          title: "SFU Food Court Recommendations",
+          content: "The food court prices are getting ridiculous. Best budget options: the sandwich place near the bookstore, and the Asian food stall has decent portions for the price.",
+          username: "hungry_student",
+          score: 19,
+          course_id: null,
+          professor: null,
+          tags: ["food", "campus", "budget"]
+        },
+        {
+          title: "Parking at SFU - Pro Tips",
+          content: "If you're driving to campus, the best parking is in the West Mall Complex after 2 PM. Before that, you're better off taking the bus. The parking pass is worth it if you're here 4+ days a week.",
+          username: "commuter_student",
+          score: 16,
+          course_id: null,
+          professor: null,
+          tags: ["parking", "transportation", "campus"]
+        },
+        {
+          title: "SFU Recreation Center - Best Times to Go",
+          content: "The gym is packed from 4-7 PM. Best times are early morning (6-8 AM) or late evening (9-11 PM). The pool is usually less crowded on weekends.",
+          username: "fitness_enthusiast",
           score: 12,
-          course_id: "phys301",
-          professor: "Prof. Wilson",
-          tags: ["lab-reports", "guidelines"]
+          course_id: null,
+          professor: null,
+          tags: ["gym", "fitness", "campus"]
+        },
+        {
+          title: "SFU Clubs and Societies Fair",
+          content: "The clubs fair is next week in the SUB! Great way to meet people with similar interests. The computer science club always has cool demos and free pizza.",
+          username: "club_organizer",
+          score: 14,
+          course_id: null,
+          professor: null,
+          tags: ["clubs", "social", "campus"]
         }
       ];
 
@@ -307,7 +429,7 @@ const seedData = () => {
                 // Insert some course follows for the dummy user
                 db.run(`
                   INSERT OR IGNORE INTO course_follows (username, course_id)
-                  VALUES ('EmilyQ', 'cs101'), ('EmilyQ', 'math201')
+                  VALUES ('EmilyQ', 'cmpt120'), ('EmilyQ', 'math152')
                 `, (err) => {
                   if (err) {
                     console.error('Error inserting course follows:', err);
@@ -327,7 +449,7 @@ const seedData = () => {
                     // Insert professor preferences for the dummy user
                     db.run(`
                       INSERT OR IGNORE INTO professor_preferences (username, course_id, professor_name)
-                      VALUES ('EmilyQ', 'cs101', 'Dr. Smith'), ('EmilyQ', 'math201', 'Prof. Johnson')
+                      VALUES ('EmilyQ', 'cmpt120', 'Dr. Brian Fraser'), ('EmilyQ', 'math152', 'Prof. Jamie Mulholland')
                     `, (err) => {
                       if (err) {
                         console.error('Error inserting professor preferences:', err);

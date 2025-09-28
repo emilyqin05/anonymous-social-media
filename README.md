@@ -128,7 +128,7 @@ curl http://localhost:3001/api/users/me
 # Create a new post
 curl -X POST http://localhost:3001/api/posts \
   -H "Content-Type: application/json" \
-  -d '{"title":"Test Post","content":"This is a test","courseId":"cs101"}'
+  -d '{"title":"Test Post","content":"This is a test","courseId":"cmpt120"}'
 
 # Vote on a post
 curl -X POST http://localhost:3001/api/votes \

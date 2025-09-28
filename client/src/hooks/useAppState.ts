@@ -42,8 +42,8 @@ const initialPosts: Post[] = [
     score: 15,
     user_vote: undefined, // Changed from 'userVote'
     created_at: "2024-01-15T10:30:00Z", // Changed from 'createdAt'
-    courseId: "cs101",
-    professor: "Dr. Smith",
+    courseId: "cmpt120",
+    professor: "Dr. Brian Fraser",
     tags: ["study-tips", "finals"],
   },
   {
@@ -54,8 +54,8 @@ const initialPosts: Post[] = [
     score: 8,
     user_vote: undefined,
     created_at: "2024-01-14T15:45:00Z",
-    courseId: "math201",
-    professor: "Prof. Johnson",
+    courseId: "math152",
+    professor: "Prof. Jamie Mulholland'",
     tags: ["homework", "help"],
   },
   {
@@ -84,18 +84,18 @@ const initialPosts: Post[] = [
 
 const initialCourses: Course[] = [
   {
-    id: "cs101",
+    id: "cmpt120",
     name: "Introduction to Computer Science",
     code: "CS 101",
-    professors: ["Dr. Smith", "Prof. Davis"],
+    professors: ["Dr. Brian Fraser", "Prof. Davis"],
     description: "Fundamentals of programming and computer science concepts",
     followerCount: 245,
   },
   {
-    id: "math201",
+    id: "math152",
     name: "Calculus II",
     code: "MATH 201",
-    professors: ["Prof. Johnson", "Dr. Lee"],
+    professors: ["Prof. Jamie Mulholland'", "Dr. Lee"],
     description: "Integration techniques and applications",
     followerCount: 189,
   },
@@ -121,11 +121,11 @@ export function useAppState() {
   const [state, setState] = useState<AppState>({
     posts: initialPosts,
     courses: initialCourses,
-    followedCourses: ["cs101", "math201"],
+    followedCourses: ["cmpt120", "math152"],
     followedTags: ["study-tips", "campus"],
     professorPreferences: {
-      cs101: "Dr. Smith",
-      math201: "Prof. Johnson",
+      cmpt120: "Dr. Brian Fraser",
+      math152: "Prof. Jamie Mulholland'",
     },
   })
 
