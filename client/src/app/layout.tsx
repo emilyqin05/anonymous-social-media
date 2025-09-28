@@ -10,8 +10,8 @@ import Navbar from "@/components/Navbar"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "School Reddit Clone",
-  description: "A simplified Reddit clone for our school",
+  title: "SFU Reddit Clone",
+  description: "A simplified Reddit clone for our SFU",
 }
 
 export default function RootLayout({

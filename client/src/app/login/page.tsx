@@ -34,7 +34,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to School Reddit</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to SFU Reddit</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
@@ -55,7 +55,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="your.email@myschool.edu"
+                placeholder="your.email@mySFU.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

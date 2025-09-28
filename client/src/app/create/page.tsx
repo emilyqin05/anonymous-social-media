@@ -124,7 +124,7 @@ export default function CreatePostPage() {
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create a Post</h1>
-          <p className="text-gray-600">Share something with your school community</p>
+          <p className="text-gray-600">Share something with your SFU community</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border p-6">

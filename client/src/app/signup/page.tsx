@@ -26,8 +26,8 @@ export default function SignupPage() {
       return
     }
 
-    if (!email.endsWith("@myschool.edu")) {
-      setError("Must use @myschool.edu email address")
+    if (!email.endsWith("@mySFU.edu")) {
+      setError("Must use @mySFU.edu email address")
       return
     }
 
@@ -83,7 +83,7 @@ export default function SignupPage() {
                 type="email"
                 required
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="your.email@myschool.edu"
+                placeholder="your.email@mySFU.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
