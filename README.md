@@ -2,7 +2,7 @@
 
 A full-stack anonymous social media application built with Next.js (frontend) and Node.js/Express (backend) with SQLite database.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -34,7 +34,7 @@ A full-stack anonymous social media application built with Next.js (frontend) an
 - **Backend API**: http://localhost:3001
 - **API Health Check**: http://localhost:3001/api/health
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 anonymous-social-media/
@@ -54,25 +54,25 @@ anonymous-social-media/
 └── start-dev.sh          # Development startup script
 ```
 
-## 🎯 Features
+## Features
 
 ### Current Implementation
-- ✅ **Posts System**: Create, view, and manage posts
-- ✅ **Course System**: Follow courses and set professor preferences
-- ✅ **Voting System**: Upvote/downvote posts with real-time score updates
-- ✅ **Tag System**: Categorize posts with tags
-- ✅ **User Feed**: Personalized feed based on followed content
-- ✅ **Database**: SQLite with proper schema and relationships
-- ✅ **API**: RESTful API with CORS support
+- **Posts System**: Create, view, and manage posts
+- **Course System**: Follow courses and set professor preferences
+- **Voting System**: Upvote/downvote posts with real-time score updates
+- **Tag System**: Categorize posts with tags
+- **User Feed**: Personalized feed based on followed content
+- **Database**: SQLite with proper schema and relationships
+- **API**: RESTful API with CORS support
 
 ### Planned Features
-- 🔄 **Authentication**: User registration and login
-- 🔄 **Comments**: Comment system for posts
-- 🔄 **Real-time Updates**: WebSocket support for live updates
-- 🔄 **File Uploads**: Image and file attachments
-- 🔄 **Moderation**: Content moderation tools
+- **Authentication**: User registration and login
+- **Comments**: Comment system for posts
+- **Real-time Updates**: WebSocket support for live updates
+-  **File Uploads**: Image and file attachments
+- **Moderation**: Content moderation tools
 
-## 📊 Database Schema
+## Database Schema
 
 The SQLite database includes these main tables:
 - `users` - User accounts and authentication
@@ -85,7 +85,7 @@ The SQLite database includes these main tables:
 - `tag_follows` - User tag subscriptions
 - `professor_preferences` - User professor preferences
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Posts
 - `GET /api/posts` - Get all posts (with filtering)
@@ -114,7 +114,7 @@ The SQLite database includes these main tables:
 - `GET /api/users/feed` - Get personalized feed
 - `GET /api/users/posts` - Get user's posts
 
-## 🧪 Testing the Backend
+## Testing the Backend
 
 The backend comes with dummy data for testing:
 
@@ -136,7 +136,7 @@ curl -X POST http://localhost:3001/api/votes \
   -d '{"postId":1,"voteValue":1}'
 ```
 
-## 🔧 Development
+## Development
 
 ### Backend Development
 ```bash
@@ -151,33 +151,3 @@ cd client
 npm run dev  # Start Next.js development server
 npm run build  # Build for production
 ```
-
-## 📝 Dummy Data
-
-The database is pre-populated with:
-- **4 Courses**: CS 101, MATH 201, PHYS 301, ENG 102
-- **4 Sample Posts**: Various topics with different scores
-- **1 Test User**: EmilyQ (for testing without auth)
-- **Sample Follows**: Course and tag subscriptions
-- **Professor Preferences**: Set for test user
-
-## 🚧 Next Steps
-
-1. **Connect Frontend to Backend**: Update the frontend to use the API instead of hardcoded data
-2. **Implement Authentication**: Add user registration and login
-3. **Add Real-time Features**: WebSocket support for live updates
-4. **Enhance UI/UX**: Improve the user interface and experience
-5. **Add Testing**: Unit and integration tests
-6. **Deploy**: Set up production deployment
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
