@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { use, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -11,9 +11,7 @@ import { postsApi, coursesApi, followsApi, Post, Course } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
 
 interface CoursePageProps {
-  params: {
-    courseId: string
-  }
+  params: Promise<{ courseId: string }>
 }
 
 export default function CoursePage({ params }: CoursePageProps) {
@@ -26,24 +24,26 @@ export default function CoursePage({ params }: CoursePageProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  const unwrappedParams = use(params)
+
   useEffect(() => {
     loadCourseData()
-  }, [params.courseId, sortBy])
+  }, [unwrappedParams.courseId, sortBy])
 
   const loadCourseData = async () => {
     try {
       setLoading(true)
       const [courseData, postsData, followedCourses, professorPreferences] = await Promise.all([
-        coursesApi.getById(params.courseId),
-        postsApi.getAll({ courseId: params.courseId, sortBy }),
+        coursesApi.getById(unwrappedParams.courseId),
+        postsApi.getAll({ courseId: unwrappedParams.courseId, sortBy }),
         user ? followsApi.getFollowedCourses() : Promise.resolve([]),
         user ? followsApi.getProfessorPreferences() : Promise.resolve({})
       ])
       
       setCourse(courseData)
       setPosts(postsData)
-      setIsFollowing(followedCourses.includes(params.courseId))
-      setPreferredProfessor((professorPreferences as Record<string, string>)[params.courseId] || "")
+      setIsFollowing(followedCourses.includes(unwrappedParams.courseId))
+      setPreferredProfessor((professorPreferences as Record<string, string>)[unwrappedParams.courseId] || "")
     } catch (error) {
       console.error('Error loading course data:', error)
       setError('Failed to load course data')
@@ -57,10 +57,10 @@ export default function CoursePage({ params }: CoursePageProps) {
     
     try {
       if (isFollowing) {
-        await followsApi.unfollowCourse(params.courseId)
+        await followsApi.unfollowCourse(unwrappedParams.courseId)
         setIsFollowing(false)
       } else {
-        await followsApi.followCourse(params.courseId)
+        await followsApi.followCourse(unwrappedParams.courseId)
         setIsFollowing(true)
       }
       // Trigger sidebar refresh
@@ -74,7 +74,7 @@ export default function CoursePage({ params }: CoursePageProps) {
     if (!user) return
     
     try {
-      await followsApi.setProfessorPreference(params.courseId, professor)
+      await followsApi.setProfessorPreference(unwrappedParams.courseId, professor)
       setPreferredProfessor(professor)
       // Trigger sidebar refresh
       window.dispatchEvent(new CustomEvent('sidebar-refresh'))
@@ -173,7 +173,7 @@ export default function CoursePage({ params }: CoursePageProps) {
               <SelectItem value="new">New</SelectItem>
             </SelectContent>
           </Select>
-          <Link href={`/create?course=${params.courseId}`}>
+          <Link href={`/create?course=${unwrappedParams.courseId}`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Create Post
@@ -186,7 +186,7 @@ export default function CoursePage({ params }: CoursePageProps) {
         <div className="text-center py-12 bg-card rounded-lg border">
           <h3 className="text-lg font-medium mb-2">No posts yet</h3>
           <p className="text-muted-foreground mb-4">Be the first to post in {course.code}!</p>
-          <Link href={`/create?course=${params.courseId}`}>
+          <Link href={`/create?course=${unwrappedParams.courseId}`}>
             <Button>Create First Post</Button>
           </Link>
         </div>
