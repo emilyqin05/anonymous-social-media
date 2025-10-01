@@ -3,7 +3,8 @@
 import { useState } from "react"
 
 interface VoteButtonsProps {
-  postId: number
+  postId?: number
+  commentId?: number
   score: number
   userVote?: number
   onVoteChange?: (newScore: number, newUserVote: number | null) => void
@@ -11,6 +12,7 @@ interface VoteButtonsProps {
 
 export default function VoteButtons({
   postId,
+  commentId,
   score: initialScore,
   userVote: initialUserVote,
   onVoteChange,

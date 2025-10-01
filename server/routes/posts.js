@@ -14,12 +14,13 @@ router.get('/', (req, res) => {
     FROM posts p
     LEFT JOIN post_tags pt ON p.id = pt.post_id
     LEFT JOIN tags t ON pt.tag_id = t.id
+    WHERE p.is_deleted = 0
   `;
   
   const params = [];
   
   if (courseId) {
-    query += ' WHERE p.course_id = ?';
+    query += ' AND p.course_id = ?';
     params.push(courseId);
   }
   
@@ -63,7 +64,7 @@ router.get('/:id', (req, res) => {
     FROM posts p
     LEFT JOIN post_tags pt ON p.id = pt.post_id
     LEFT JOIN tags t ON pt.tag_id = t.id
-    WHERE p.id = ?
+    WHERE p.id = ? AND p.is_deleted = 0
     GROUP BY p.id
   `;
 
@@ -179,20 +180,21 @@ router.put('/:id', (req, res) => {
   });
 });
 
-// Delete a post (for future use)
+// Delete a post (soft delete)
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
+  const username = 'EmilyQ'; // Hardcoded for now
 
-  const query = 'DELETE FROM posts WHERE id = ?';
+  const query = 'UPDATE posts SET is_deleted = 1 WHERE id = ? AND username = ?';
   
-  db.run(query, [id], function(err) {
+  db.run(query, [id, username], function(err) {
     if (err) {
       console.error('Error deleting post:', err);
       return res.status(500).json({ error: 'Failed to delete post' });
     }
 
     if (this.changes === 0) {
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(404).json({ error: 'Post not found or not authorized' });
     }
 
     res.json({ message: 'Post deleted successfully' });

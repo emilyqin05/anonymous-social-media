@@ -268,6 +268,10 @@
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import VoteButtons from "./VoteButtons"
+import MoreMenu from "./MoreMenu"
+import ConfirmDialog from "./ConfirmDialog"
+import { Trash2, Flag } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface Post {
   id: number
@@ -284,10 +288,14 @@ interface Post {
 
 interface PostCardProps {
   post: Post
+  isDetailView?: boolean
+  onDelete?: (postId: number) => void
 }
 
-export default function PostCard({ post: initialPost }: PostCardProps) {
+export default function PostCard({ post: initialPost, isDetailView = false, onDelete }: PostCardProps) {
+  const { user } = useAuth()
   const [post, setPost] = useState(initialPost)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleVoteChange = (newScore: number, newUserVote: number | null) => {
     setPost((prev) => ({
@@ -315,6 +323,9 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
 
   const formatContent = (content: string) => {
     // Simple formatting: preserve line breaks and limit length for preview
+    if (isDetailView) {
+      return content // Show full content in detail view
+    }
     const maxLength = 500
     if (content.length <= maxLength) {
       return content
@@ -322,8 +333,51 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
     return content.substring(0, maxLength) + "..."
   }
 
+  const handlePostClick = () => {
+    if (!isDetailView) {
+      window.location.href = `/post/${post.id}`
+    }
+  }
+
+  const isOwner = user?.username === post.username
+
+  const menuItems: Array<{
+    label: string
+    icon: React.ReactNode
+    onClick: () => void
+    variant?: "default" | "destructive"
+  }> = [
+    {
+      label: "Report",
+      icon: <Flag className="h-4 w-4" />,
+      onClick: () => {
+        // TODO: Implement report functionality
+        console.log("Report post:", post.id)
+      }
+    }
+  ]
+
+  if (isOwner) {
+    menuItems.unshift({
+      label: "Delete",
+      icon: <Trash2 className="h-4 w-4" />,
+      onClick: () => setShowDeleteDialog(true),
+      variant: "destructive"
+    })
+  }
+
+  const handleDeleteConfirm = () => {
+    onDelete?.(post.id)
+    setShowDeleteDialog(false)
+  }
+  
   return (
-    <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+    <div 
+      className={`bg-white rounded-lg shadow-sm border transition-shadow duration-200 ${
+        isDetailView ? '' : 'hover:shadow-md cursor-pointer'
+      }`}
+      onClick={handlePostClick}
+    >
       <div className="flex p-4">
         {/* Voting section */}
         <div className="mr-4">
@@ -332,28 +386,30 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
 
         {/* Post content */}
         <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <div className="flex items-center">
+              <span className="font-medium">u/{post.username}</span>
+              <span className="mx-1">•</span>
+              <span>{formatDate(post.created_at)}</span>
+            </div>
+            <MoreMenu items={menuItems} />
+          </div>
+          
+          {/* Course and Professor info */}
           <div className="flex items-center text-xs text-gray-500 mb-2">
-            <span className="font-medium">u/{post.username}</span>
-            <span className="mx-1">•</span>
-            <span>{formatDate(post.created_at)}</span>
-            
-            {/* Course and Professor info */}
             {post.course_id && (
               <>
-                <span className="mx-1">•</span>
                 <span className="text-blue-600 font-medium">
                   {post.course_id.toUpperCase()}
                 </span>
+                {post.professor && <span className="mx-1">•</span>}
               </>
             )}
             
             {post.professor && (
-              <>
-                <span className="mx-1">•</span>
-                <span className="text-purple-600">
-                  {post.professor}
-                </span>
-              </>
+              <span className="text-purple-600">
+                {post.professor}
+              </span>
             )}
           </div>
 
@@ -380,7 +436,15 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
 
           {/* Post actions */}
           <div className="flex items-center mt-3 space-x-4 text-xs text-gray-500">
-            <button className="flex items-center space-x-1 hover:text-gray-700 transition-colors">
+            <button 
+              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (!isDetailView) {
+                  window.location.href = `/post/${post.id}`
+                }
+              }}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -392,7 +456,10 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
               <span>Comments</span>
             </button>
 
-            <button className="flex items-center space-x-1 hover:text-gray-700 transition-colors">
+            <button 
+              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -406,6 +473,18 @@ export default function PostCard({ post: initialPost }: PostCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   )
 }

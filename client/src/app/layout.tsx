@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import Sidebar from "@/components/Sidebar"
+import BottomNav from "@/components/BottomNav"
 import { AuthProvider } from "@/contexts/AuthContext"   // ✅ import your provider
 import Navbar from "@/components/Navbar"
 
@@ -27,9 +28,15 @@ export default function RootLayout({
           <Navbar />
 
           <div className="flex">
-            <Sidebar />
-            <main className="flex-1 min-h-screen">{children}</main>
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block">
+              <Sidebar />
+            </div>
+            <main className="flex-1 min-h-screen pb-16 md:pb-0">{children}</main>
           </div>
+          
+          {/* Mobile Bottom Navigation */}
+          <BottomNav />
         </AuthProvider>
       </body>
     </html>

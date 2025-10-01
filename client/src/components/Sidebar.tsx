@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Compass, BookOpen, Hash } from "lucide-react"
+import { Home, Compass, BookOpen, Hash, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { coursesApi, followsApi, Course } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
@@ -77,6 +77,12 @@ function Sidebar() {
                   Explore
                 </Button>
               </Link>
+              <Link href="/courses">
+                <Button variant={pathname === "/courses" ? "secondary" : "ghost"} className="w-full justify-start">
+                  <GraduationCap className="mr-2 h-4 w-4" />
+                  Your Courses
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="text-center py-8">
@@ -104,6 +110,12 @@ function Sidebar() {
               <Button variant={pathname === "/explore" ? "secondary" : "ghost"} className="w-full justify-start">
                 <Compass className="mr-2 h-4 w-4" />
                 Explore
+              </Button>
+            </Link>
+            <Link href="/courses">
+              <Button variant={pathname === "/courses" ? "secondary" : "ghost"} className="w-full justify-start">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                Your Courses
               </Button>
             </Link>
           </div>
@@ -136,7 +148,7 @@ function Sidebar() {
           </div>
         </div>
 
-        {/* Followed Tags */}
+        {/* Followed Tags
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground mb-3">Followed Tags</h2>
           <div className="space-y-1">
@@ -155,7 +167,7 @@ function Sidebar() {
               ))
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   )

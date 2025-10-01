@@ -13,6 +13,16 @@ export interface Post {
   tags: string[];
 }
 
+export interface Comment {
+  id: number;
+  post_id: number;
+  username: string;
+  content: string;
+  score: number;
+  user_vote?: number;
+  created_at: string;
+}
+
 export interface Course {
   id: string;
   name: string;
@@ -74,15 +84,41 @@ export const coursesApi = {
   }
 };
 
+// Comments API
+export const commentsApi = {
+  getByPostId: async (postId: number): Promise<Comment[]> => {
+    const response = await api.get(`/comments/post/${postId}`);
+    return response.data;
+  },
+
+  create: async (data: { postId: number; content: string }): Promise<Comment> => {
+    const response = await api.post('/comments', data);
+    return response.data;
+  },
+
+  update: async (id: number, content: string): Promise<void> => {
+    await api.put(`/comments/${id}`, { content });
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/comments/${id}`);
+  }
+};
+
 // Votes API
 export const votesApi = {
-  vote: async (postId: number, voteValue: number): Promise<{ postId: number; score: number; userVote: number | null }> => {
+  votePost: async (postId: number, voteValue: number): Promise<{ postId: number; score: number; userVote: number | null }> => {
     const response = await api.post('/votes', { postId, voteValue });
     return response.data;
   },
 
-  getUserVote: async (postId: number): Promise<{ postId: number; userVote: number | null }> => {
-    const response = await api.get(`/votes/${postId}`);
+  voteComment: async (commentId: number, voteValue: number): Promise<{ commentId: number; score: number; userVote: number | null }> => {
+    const response = await api.post('/votes', { commentId, voteValue });
+    return response.data;
+  },
+
+  getUserVote: async (id: number, type: 'post' | 'comment'): Promise<{ postId?: number; commentId?: number; userVote: number | null }> => {
+    const response = await api.get(`/votes/${id}?type=${type}`);
     return response.data;
   }
 };

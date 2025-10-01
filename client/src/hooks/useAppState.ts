@@ -85,7 +85,7 @@ const initialPosts: Post[] = [
 const initialCourses: Course[] = [
   {
     id: "cmpt120",
-    name: "Introduction to Computer Science",
+    name: "System Design and Programming",
     code: "CS 101",
     professors: ["Dr. Brian Fraser", "Prof. Davis"],
     description: "Fundamentals of programming and computer science concepts",
@@ -93,7 +93,7 @@ const initialCourses: Course[] = [
   },
   {
     id: "math152",
-    name: "Calculus II",
+    name: "Calculus I",
     code: "MATH 201",
     professors: ["Prof. Jamie Mulholland'", "Dr. Lee"],
     description: "Integration techniques and applications",

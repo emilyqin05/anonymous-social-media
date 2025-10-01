@@ -1,3 +1,4 @@
+//Homepage
 "use client"
 
 import { useState, useEffect } from "react"
@@ -15,12 +16,38 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [sortBy, setSortBy] = useState<"score" | "new">("score")
+  const handlePostDelete = async (postId: number) => {
+    console.log("Deleting post with ID:", postId);
+    // Optimistically remove from UI
+    setPosts(prev => prev.filter(p => p.id !== postId))
+  }
 
   useEffect(() => {
     if (user) {
       loadFeed()
     }
   }, [user, sortBy])
+
+  useEffect(() => {
+    if (user) {
+      loadFeed()
+    }
+  }, [])
+
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        loadFeed()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [user])
 
   const loadFeed = async () => {
     try {
@@ -108,7 +135,11 @@ export default function HomePage() {
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard 
+              key={post.id} 
+              post={post} 
+              onDelete={handlePostDelete}
+            />
           ))}
         </div>
       )}

@@ -50,6 +50,7 @@ const init = () => {
           score INTEGER DEFAULT 1,
           course_id TEXT,
           professor TEXT,
+          is_deleted BOOLEAN DEFAULT 0,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (course_id) REFERENCES courses (id)
         )
@@ -74,16 +75,34 @@ const init = () => {
         )
       `);
 
+      // Comments table
+      db.run(`
+        CREATE TABLE IF NOT EXISTS comments (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          post_id INTEGER NOT NULL,
+          username TEXT NOT NULL,
+          content TEXT NOT NULL,
+          score INTEGER DEFAULT 1,
+          is_deleted BOOLEAN DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (post_id) REFERENCES posts (id)
+        )
+      `);
+
       // Votes table
       db.run(`
         CREATE TABLE IF NOT EXISTS votes (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          post_id INTEGER NOT NULL,
+          post_id INTEGER,
+          comment_id INTEGER,
           username TEXT NOT NULL,
           vote_value INTEGER NOT NULL CHECK (vote_value IN (-1, 1)),
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           UNIQUE(post_id, username),
-          FOREIGN KEY (post_id) REFERENCES posts (id)
+          UNIQUE(comment_id, username),
+          FOREIGN KEY (post_id) REFERENCES posts (id),
+          FOREIGN KEY (comment_id) REFERENCES comments (id),
+          CHECK ((post_id IS NOT NULL AND comment_id IS NULL) OR (post_id IS NULL AND comment_id IS NOT NULL))
         )
       `);
 
@@ -137,14 +156,14 @@ const seedData = () => {
       const courses = [
         {
           id: 'cmpt120',
-          name: 'Introduction to Computer Science',
+          name: 'System Design and Programming',
           code: 'CMPT 120',
           description: 'Fundamentals of programming and computer science concepts',
           follower_count: 245
         },
         {
           id: 'math152',
-          name: 'Calculus II',
+          name: 'Calculus I',
           code: 'MATH 152',
           description: 'Integration techniques and applications',
           follower_count: 189
